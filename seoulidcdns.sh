@@ -20,7 +20,7 @@ zone "awsseoul.internal" {
     forward only;
     forwarders { 10.1.3.250; 10.1.4.250; };
 };
-zone "awssydeny.internal" {
+zone "awssp.internal" {
     type forward;
     forward only;
     forwarders { 10.3.3.250; 10.3.4.250; };
@@ -35,7 +35,7 @@ zone "idcseoul.internal" {
 
 zone "2.10.in-addr.arpa" {
     type master;
-    file "/etc/bind/db.10.2";  # 10.2.0.0/16 subnet
+    file "/etc/bind/db.10.2";
 };
 EOT
 
