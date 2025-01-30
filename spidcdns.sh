@@ -1,8 +1,8 @@
 #!/bin/bash
 hostnamectl --static set-hostname SP-IDC-DNSSRV
 sed -i "s/^127.0.0.1 localhost/127.0.0.1 localhost VPC2-SP-IDC-DNSSRV/g" /etc/hosts
-apt-get update -y
-apt-get install bind9 bind9-doc language-pack-ko -y
+yum update -y
+yum install bind9 bind9-doc language-pack-ko -y
 
 cat <<EOT> /etc/bind/named.conf.options
 options {
