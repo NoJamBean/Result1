@@ -1,5 +1,13 @@
 #!/bin/bash
+ip route add 10.3.0.0/16 via 10.2.1.50
+ip route add 10.1.0.0/16 via 10.2.1.50
+ip route add 10.4.0.0/16 via 10.2.1.50
 hostnamectl --static set-hostname Seoul-IDC-DB
+
+cat<<EOT>> /etc/resolv.conf
+nameserver 10.2.1.200
+EOT
+
 yum install -y mariadb-server mariadb lynx
 systemctl start mariadb && systemctl enable mariadb
 echo -e "\n\nqwe123\nqwe123\ny\ny\ny\ny\n" | /usr/bin/mysql_secure_installation
