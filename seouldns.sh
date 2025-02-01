@@ -1,19 +1,45 @@
 #!/bin/bash
 hostnamectl --static set-hostname Seoul-IDC-DNSSRV
-sed -i "s/^127.0.0.1 localhost/127.0.0.1 localhost VPC2-Seoul-IDC-DNSSRV/g" /etc/hosts
-yum update -y
-yum install bind9 bind9-doc language-pack-ko -y
+ip route add 10.3.0.0/16 via 10.2.1.50
+ip route add 10.1.0.0/16 via 10.2.1.50
+ip route add 10.4.0.0/16 via 10.2.1.50
+sed -i "s/^127.0.0.1   localhost/127.0.0.1 localhost idc-seoul-dns/g" /etc/hosts
+# Update and install necessary packages
 
-cat <<EOT> /etc/bind/named.conf.options
+yum clean all
+rm -rf /var/cache/yum
+yum update -y
+yum install -y bind bind-utils glibc-langpack-ko
+# Configure BIND
+cp -p /etc/named.conf /etc/named.conf.bak
+cat <<EOT > /etc/named.conf
 options {
-  directory "/var/cache/bind";
-  recursion yes;
-  allow-query { any; };
-  forwarders {
-        8.8.8.8;
+        listen-on port 53 { any; };
+        listen-on-v6 port 53 { ::1; };
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";        
+        recursing-file  "/var/named/data/named.recursing";
+        secroots-file   "/var/named/data/named.secroots";
+        allow-query     { any; };
+        recursion yes;
+        dnssec-enable no;
+        dnssec-validation no;
+        bindkeys-file "/etc/named.root.key";
+        managed-keys-directory "/var/named/dynamic";
+        pid-file "/run/named/named.pid";
+        session-keyfile "/run/named/session.key";
+};
+logging {
+        channel default_debug {
+                file "data/named.run";
+                severity dynamic;
         };
-  forward only;
-  auth-nxdomain no;
+};
+zone "." IN {
+        type hint;
+        file "named.ca";
 };
 zone "awsseoul.internal" {
     type forward;
@@ -25,60 +51,54 @@ zone "awssp.internal" {
     forward only;
     forwarders { 10.3.3.250; 10.3.4.250; };
 };
-EOT
-
-cat <<EOT> /etc/bind/named.conf.local
 zone "idcseoul.internal" {
     type master;
-    file "/etc/bind/db.idcseoul.internal";
+    file "/var/named/db.idcseoul.internal";
 };
-
 zone "2.10.in-addr.arpa" {
     type master;
-    file "/etc/bind/db.10.2";
+    file "/var/named/db.10.2";
 };
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";
 EOT
-
-cat <<EOT> /etc/bind/db.idcseoul.internal
-\$TTL 30
+# Create forward zone file
+cat <<EOT > /var/named/db.idcseoul.internal
+\$TTL 86400  ; 1 day
 @ IN SOA idcseoul.internal. root.idcseoul.internal. (
-  2019122114 ; serial
-  3600       ; refresh
-  900        ; retry
-  604800     ; expire
-  86400      ; minimum ttl
+    2025013001 ; serial
+    3600       ; refresh
+    900        ; retry
+    604800     ; expire
+    86400      ; minimum ttl
 )
-
-; dns server
+; DNS server
 @      IN NS ns1.idcseoul.internal.
-
-; ip address of dns server
 ns1    IN A  10.2.1.200
-
 ; Hosts
-db   IN A  10.2.1.100
-dns   IN A  10.2.1.200
+db     IN A  10.2.1.100
+dns    IN A  10.2.1.200
+cgw    IN A  10.2.1.50
 EOT
-
-cat <<EOT> /etc/bind/db.10.2
-\$TTL 30
+# Create reverse zone file
+cat <<EOT > /var/named/db.10.2
+\$TTL 86400  ; 1 day
 @ IN SOA idcseoul.internal. root.idcseoul.internal. (
-  2019122114 ; serial
-  3600       ; refresh
-  900        ; retry
-  604800     ; expire
-  86400      ; minimum ttl
+    2025013002 ; serial
+    3600       ; refresh
+    900        ; retry
+    604800     ; expire
+    86400      ; minimum ttl
 )
-
-; dns server
+; DNS server
 @      IN NS ns1.idcseoul.internal.
-
-; ip address of dns server
-3      IN PTR  ns1.idcseoul.internal.
-
-; A Record list
-100.1    IN PTR  db.idcseoul.internal.
-200.1    IN PTR  dns.idcseoul.internal.
+; PTR Records
+100.1    IN PTR db.idcseoul.internal.  ; TTL 86400
+200.1    IN PTR dns.idcseoul.internal. ; TTL 86400
+50.1     IN PTR cgw.idcseoul.internal.  ; TTL 86400
 EOT
-
-systemctl start bind9 && systemctl enable bind9
+# Set permissions and restart BIND
+chown named:named /var/named/db.idcseoul.internal /var/named/db.10.2
+chmod 640 /var/named/db.idcseoul.internal /var/named/db.10.2
+systemctl enable named
+systemctl start named
