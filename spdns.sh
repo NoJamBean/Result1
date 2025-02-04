@@ -1,5 +1,5 @@
 #!/bin/bash
-cat<<EOT >> /etc/resolv.conf
+cat<<EOT > /etc/resolv.conf
 nameserver 10.4.1.200
 nameserver 8.8.8.8
 nameserver 8.8.4.4

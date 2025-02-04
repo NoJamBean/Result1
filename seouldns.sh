@@ -1,7 +1,12 @@
 #!/bin/bash
 
+cat<<EOT > /etc/resolv.conf
+nameserver 10.2.1.200
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+EOT
+
 hostnamectl --static set-hostname Seoul-IDC-DNS
-sed -i "s/^127.0.0.1   localhost/127.0.0.1 localhost idc-seoul-dns/g" /etc/hosts
 
 yum clean all
 yum update -y
