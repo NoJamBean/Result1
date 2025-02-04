@@ -3,9 +3,6 @@
 hostnamectl --static set-hostname Seoul-IDC-DNS
 sed -i "s/^127.0.0.1   localhost/127.0.0.1 localhost idc-seoul-dns/g" /etc/hosts
 
-yum clean all
-rm -rf /var/cache/yum
-yum update -y
 yum install -y bind bind-utils glibc-langpack-ko
 
 sed -i 's/listen-on port 53 { 127.0.0.1; };/listen-on port 53 { any; };/g' /etc/named.conf
