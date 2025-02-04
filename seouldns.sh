@@ -12,7 +12,7 @@ yum clean all
 yum update -y
 yum install -y bind bind-utils glibc-langpack-ko
 
-cat <<EOT >> /etc/named.conf
+cat <<EOT > /etc/named.conf
 options {
         listen-on port 53 { any; };
         listen-on-v6 port 53 { none; };

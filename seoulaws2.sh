@@ -13,7 +13,8 @@ mkdir /var/www/inc
 curl -o /var/www/inc/dbinfo.inc php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/dbinfo.inc
 curl -o /var/www/html/db.php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/db.php
 rm -rf /var/www/html/index.html
-echo "<h1>SeoulRegion - Web2</h1>" > /var/www/html/index.html
+curl -o /var/www/html/index.html https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/testindex.html
+sed -i "메인 제목"/SeoulRegion - Web1/g" /etc/hosts
 curl -o /opt/pingcheck.sh https://cloudneta-book.s3.ap-northeast-2.amazonaws.com/chapter8/pingchecker.sh
 chmod +x /opt/pingcheck.sh
 cat <<EOT>> /etc/crontab

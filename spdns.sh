@@ -5,13 +5,12 @@ nameserver 8.8.8.8
 nameserver 8.8.4.4
 EOT
 hostnamectl --static set-hostname SP-IDC-DNS
-sed -i "s/^127.0.0.1   localhost/127.0.0.1 localhost idc-sp-dns/g" /etc/hosts
 
 yum clean all
 yum update -y
 yum install -y bind bind-utils glibc-langpack-ko
 
-cat <<EOT >> /etc/named.conf
+cat <<EOT > /etc/named.conf
 options {
         listen-on port 53 { any; };
         listen-on-v6 port 53 { none; };
