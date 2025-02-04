@@ -15,9 +15,6 @@ sed -i 's/{ localhost; };/{ any; };/g' /etc/named.conf
 sed -i 's/dnssec-validation yes;/dnssec-validation no;/g' /etc/named.conf
 sed -i 's/dnssec-enable yes;/dnssec-enable no;/g' /etc/named.conf
 
-include "/etc/named.rfc1912.zones";
-include "/etc/named.root.key";  
-EOT
 
 cat <<EOT >> /etc/named.rfc1912.zones
 zone "idcsp.internal" {
