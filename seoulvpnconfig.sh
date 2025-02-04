@@ -1,10 +1,10 @@
 #!/bin/sh
-read word1
-read word2
-read word3
-
 hostnamectl --static set-hostname Seoul-IDC-VPN
 yum -y install tcpdump openswan
+
+word1=${aws_eip.seoul.public_ip}
+word2=${aws_vpn_connection.seoul.tunnel1_address}
+word3=${aws_vpn_connection.seoul.tunnel2_address}
 
 cat<<EOT>> /etc/resolv.conf
 nameserver 10.2.1.200
