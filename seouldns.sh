@@ -12,11 +12,51 @@ yum clean all
 yum update -y
 yum install -y bind bind-utils glibc-langpack-ko
 
-sed -i 's/listen-on port 53 { 127.0.0.1; };/listen-on port 53 { any; };/g' /etc/named.conf
-sed -i 's/{ localhost; };/{ any; };/g' /etc/named.conf
-sed -i 's/dnssec-validation yes;/dnssec-validation no;/g' /etc/named.conf
-sed -i 's/dnssec-enable yes;/dnssec-enable no;/g' /etc/named.conf
+cat <<EOT >> /etc/named.conf
+options {
+        listen-on port 53 { any; };
+        listen-on-v6 port 53 { none; };
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        recursing-file  "/var/named/data/named.recursing";
+        secroots-file   "/var/named/data/named.secroots";
+dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        recursing-file  "/var/named/data/named.recursing";
+        secroots-file   "/var/named/data/named.secroots";
+        allow-query     { any; };
 
+        recursion yes;
+
+        dnssec-enable no;
+        dnssec-validation no;
+
+        bindkeys-file "/etc/named.root.key";
+
+        managed-keys-directory "/var/named/dynamic";
+
+        pid-file "/run/named/named.pid";
+        session-keyfile "/run/named/session.key";
+};
+
+logging {
+        channel default_debug {
+                file "data/named.run";
+                severity dynamic;
+        };
+};
+
+zone "." IN {
+        type hint;
+        file "named.ca";
+};
+
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";                                                                                                                                        14,29-36      12%
+EOT
 
 cat <<EOT >> /etc/named.rfc1912.zones
 zone "idcseoul.internal" {
