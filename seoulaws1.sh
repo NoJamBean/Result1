@@ -10,12 +10,13 @@ nameserver 10.1.3.250
 nameserver 10.1.4.250
 EOT
 
-mkdir /var/www/inc
-curl -o /var/www/inc/dbinfo.inc php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/dbinfo.inc
-curl -o /var/www/html/db.php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/db.php
 rm -rf /var/www/html/index.html
 curl -o /var/www/html/index.html https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/testindex.html
 sed -i "메인 제목"/SeoulRegion - Web1/g" /etc/hosts
+
+curl -o /var/www/html/insert.php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/insert.php
+curl -o /var/www/html/select.php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/select.php
+curl -o /var/www/html/result.php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/result.php
 
 curl -o /opt/pingcheck.sh https://cloudneta-book.s3.ap-northeast-2.amazonaws.com/chapter8/pingchecker.sh
 chmod +x /opt/pingcheck.sh
