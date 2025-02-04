@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>심플한 모던 UI</title>
+    <title>DB</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -33,8 +33,12 @@
             font-size: 20px;
             margin-bottom: 15px;
         }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
         button {
-            margin: 10px;
             padding: 10px 20px;
             border: 1px solid black;
             border-radius: 5px;
@@ -53,9 +57,10 @@
     <div class="title">메인 제목</div>
     <div class="container">
         <h2 class="subtitle">관리 페이지</h2>
-        <button class="view">조회</button>
-        <button class="add">추가</button>
-        <button class="delete">삭제</button>
+        <div class="button-container">
+            <a href='select.php'><button class="view">조회</button></a>
+            <a href='insert.php'><button class="add">추가</button></a>
+        </div>
     </div>
 </body>
 </html>

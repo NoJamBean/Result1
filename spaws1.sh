@@ -1,8 +1,14 @@
 #!/bin/bash
+
+cat<<EOT >> /etc/resolv.conf
+nameserver 10.3.3.250
+nameserver 10.3.4.250
+EOT
 hostnamectl --static set-hostname SP-AWS-Web1
 amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
 yum install -y httpd lynx
 systemctl start httpd && systemctl enable httpd
+
 mkdir /var/www/inc
 curl -o /var/www/inc/dbinfo.inc php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/dbinfo.inc
 curl -o /var/www/html/db.php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/db.php

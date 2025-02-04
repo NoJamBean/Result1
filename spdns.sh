@@ -1,84 +1,61 @@
 #!/bin/bash
-hostnamectl --static set-hostname SP-IDC-DNSSRV
-sed -i "s/^127.0.0.1 localhost/127.0.0.1 localhost VPC2-SP-IDC-DNSSRV/g" /etc/hosts
-yum update -y
-yum install bind9 bind9-doc language-pack-ko -y
-
-cat <<EOT> /etc/bind/named.conf.options
-options {
-  directory "/var/cache/bind";
-  recursion yes;
-  allow-query { any; };
-  forwarders {
-        8.8.8.8;
-        };
-  forward only;
-  auth-nxdomain no;
-};
-zone "awsseoul.internal" {
-    type forward;
-    forward only;
-    forwarders { 10.1.3.250; 10.1.4.250; };
-};
-zone "awssp.internal" {
-    type forward;
-    forward only;
-    forwarders { 10.3.3.250; 10.3.4.250; };
-};
+cat<<EOT >> /etc/resolv.conf
+nameserver 10.4.1.200
+nameserver 8.8.8.8
+nameserver 8.8.4.4
 EOT
+hostnamectl --static set-hostname SP-IDC-DNS
+sed -i "s/^127.0.0.1   localhost/127.0.0.1 localhost idc-sp-dns/g" /etc/hosts
+# Update and install necessary packages
+yum clean all
+rm -rf /var/cache/yum
+yum update -y
+yum install -y bind bind-utils glibc-langpack-ko
 
-cat <<EOT> /etc/bind/named.conf.local
+sed -i 's/listen-on port 53 { 127.0.0.1; };/listen-on port 53 { any; };/g' /etc/named.conf
+sed -i 's/{ localhost; };/{ any; };/g' /etc/named.conf
+sed -i 's/dnssec-validation yes;/dnssec-validation no;/g' /etc/named.conf
+sed -i 's/dnssec-enable yes;/dnssec-enable no;/g' /etc/named.conf
+
+cat <<EOT >> /etc/named.rfc1912.zones
 zone "idcsp.internal" {
     type master;
-    file "/etc/bind/db.idcsp.internal";
+    file "/var/named/idcsp.internal.zone";
 };
 
-zone ".10.in-addr.arpa" {
-    type master;
-    file "/etc/bind/db.10.4";
+zone "awsseoul.internal" {
+    type forward;
+    forwarders { 10.1.3.250; 10.1.4.250; };
+};
+
+zone "awssp.internal" {
+    type forward;
+    forwarders { 10.3.3.250; 10.3.4.250;};
+};
+
+zone "idcseoul.internal" {
+    type forward;
+    forwarders { 10.2.1.200; };
 };
 EOT
 
-cat <<EOT> /etc/bind/db.idcsp.internal
-\$TTL 30
-@ IN SOA idcsp.internal. root.idcsp.internal. (
-  2019122114 ; serial
-  3600       ; refresh
-  900        ; retry
-  604800     ; expire
-  86400      ; minimum ttl
-)
-
-; dns server
-@      IN NS ns1.idcsp.internal.
-
-; ip address of dns server
-ns1    IN A  10.4.1.200
-
-; Hosts
-db   IN A  10.4.1.100
-dns   IN A  10.4.1.200
+cat <<EOT > /var/named/idcsp.internal.zone
+\$TTL 86400
+@   IN  SOA     ns.idcsp.internal. admin.idcsp.internal. (
+        2025010801 ; Serial
+        3600       ; Refresh
+        1800       ; Retry
+        1209600    ; Expire
+        86400 )    ; Minimum TTL
+@       IN  NS      ns.idcsp.internal.
+ns      IN  A       10.4.1.200
+dns     IN  A       10.4.1.200
+db      IN  A       10.4.1.100
 EOT
 
-cat <<EOT> /etc/bind/db.10.4
-\$TTL 30
-@ IN SOA idcsp.internal. root.idcsp.internal. (
-  2019122114 ; serial
-  3600       ; refresh
-  900        ; retry
-  604800     ; expire
-  86400      ; minimum ttl
-)
+chown root:named /etc/named.conf /var/named/idcsp.internal.zone
+chmod 640 /etc/named.conf
+chmod 640 /var/named/idcsp.internal.zone
 
-; dns server
-@      IN NS ns1.idcsp.internal.
-
-; ip address of dns server
-3      IN PTR  ns1.idcsp.internal.
-
-; A Record list
-100.1    IN PTR  db.idcsp.internal.
-200.1    IN PTR  dns.idcsp.internal.
-EOT
-
-systemctl start bind9 && systemctl enable bind9
+systemctl enable named
+systemctl start named

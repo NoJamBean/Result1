@@ -2,7 +2,6 @@
 
 hostnamectl --static set-hostname Seoul-IDC-DNS
 sed -i "s/^127.0.0.1   localhost/127.0.0.1 localhost idc-seoul-dns/g" /etc/hosts
-# Update and install necessary packages
 
 yum clean all
 rm -rf /var/cache/yum
@@ -13,6 +12,7 @@ sed -i 's/listen-on port 53 { 127.0.0.1; };/listen-on port 53 { any; };/g' /etc/
 sed -i 's/{ localhost; };/{ any; };/g' /etc/named.conf
 sed -i 's/dnssec-validation yes;/dnssec-validation no;/g' /etc/named.conf
 sed -i 's/dnssec-enable yes;/dnssec-enable no;/g' /etc/named.conf
+
 
 cat <<EOT >> /etc/named.rfc1912.zones
 zone "idcseoul.internal" {
