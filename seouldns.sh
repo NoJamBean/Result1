@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# cat<<EOT > /etc/resolv.conf
-# nameserver 10.2.1.200
-# nameserver 8.8.8.8
-# nameserver 8.8.4.4
-# EOT
-
 hostnamectl --static set-hostname Seoul-IDC-DNS
 
 yum clean all

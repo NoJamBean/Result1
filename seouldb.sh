@@ -1,11 +1,6 @@
 #!/bin/bash
 
 hostnamectl --static set-hostname Seoul-IDC-DB
-# cat<<EOT > /etc/resolv.conf
-# nameserver 10.2.1.200
-# nameserver 8.8.8.8
-# nameserver 8.8.4.4
-# EOT
 
 yum install -y mariadb-server mariadb lynx
 systemctl start mariadb && systemctl enable mariadb
