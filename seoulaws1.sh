@@ -24,3 +24,5 @@ cat <<EOT>> /etc/crontab
 */3 * * * * root /opt/pingcheck.sh
 EOT
 echo "1" > /var/www/html/HealthCheck.txt 
+
+systemctl restart httpd
