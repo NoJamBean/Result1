@@ -11,7 +11,7 @@ systemctl start httpd && systemctl enable httpd
 
 m -rf /var/www/html/index.html
 curl -o /var/www/html/index.html https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/testindex.html
-sed -i "s/메인 제목"/SPRegion - Web/g" /etc/hosts
+sed -i "s/메인 제목/SPRegion - Web/g" /etc/hosts
 
 curl -o /var/www/html/sp_insert.php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/sp_insert.php
 curl -o /var/www/html/sp_select.php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/sp_select.php

@@ -12,7 +12,7 @@ EOT
 
 rm -rf /var/www/html/index.html
 curl -o /var/www/html/index.html https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/testindex.html
-sed -i "s/메인 제목"/SeoulRegion - Web1/g" /etc/hosts
+sed -i "s/메인 제목/SeoulRegion - Web1/g" /etc/hosts
 
 curl -o /var/www/html/insert.php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/insert.php
 curl -o /var/www/html/select.php https://raw.githubusercontent.com/NoJamBean/Result1/refs/heads/main/select.php
