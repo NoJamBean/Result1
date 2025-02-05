@@ -4,6 +4,7 @@ cat<<EOT >> /etc/resolv.conf
 nameserver 10.3.3.250
 nameserver 10.3.4.250
 EOT
+
 hostnamectl --static set-hostname SP-AWS-Web1
 amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
 yum install -y httpd lynx
